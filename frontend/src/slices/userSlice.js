@@ -40,6 +40,21 @@ export const updateProfile = createAsyncThunk(
     }
 )
 
+// Get user details
+export const getUserDetails = createAsyncThunk(
+    "user/get",
+    async (id, thunkAPI) => {
+      const token = thunkAPI.getState().auth.user.token;
+  
+      const data = await userService.getUserDetails(id, token);
+  
+      console.log(data);
+  
+      return data;
+    }
+  );
+
+  
 export const userSlice = createSlice({
     name: "user",
     initialState,
@@ -48,7 +63,6 @@ export const userSlice = createSlice({
             state.message = null
         },
     },
-
     extraReducers: (builder) => {
         builder
             .addCase(profile.pending, (state) => {
