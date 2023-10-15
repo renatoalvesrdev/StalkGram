@@ -13,25 +13,23 @@ const insertPhoto = async(req, res) => {
 
     const user = await User.findById(reqUser._id);
 
-    // Create a phot
-    const newPhoto = await Photo.create({
-        image,
-        title,
-        userId: user._id,
-        userName: user.name,
+ // Create photo
+ const newPhoto = await Photo.create({
+    image,
+    title,
+    userId: user._id,
+    userName: user.name,
+  });
+
+  // If user was photo sucessfully, return data
+  if (!newPhoto) {
+    res.status(422).json({
+      errors: ["Houve um erro, por favor tente novamente mais tarde."],
     });
+    return;
+  }
 
-    // if photo was created successfully, return data
-    if(!newPhoto) {
-        res.status(422).json({
-            errors: ["Houve um problema, por favor tente novamente mais tarde."]
-        })
-        return
-    }
-
-    res.status(201).json(newPhoto)
-
-    res.send("Photo Insert")
+  res.status(201).json(newPhoto);
 };
 
 //Remove a photo from db
