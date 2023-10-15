@@ -5,7 +5,7 @@ import { uploads } from '../../utils/config'
 // components
 import Message from '../../components/Message'
 import { Link } from 'react-router-dom'
-import { BsFillEyeFill, BsPenciFill, BsXLg } from 'react-icons/bs'
+import { BsFillEyeFill, BsPencilFill, BsXLg } from 'react-icons/bs'
 
 //hooks
 import {useEffect, useState, useRef } from 'react'
@@ -14,7 +14,11 @@ import { useParams } from 'react-router-dom'
 
 //redux
 import { getUserDetails } from '../../slices/userSlice'
-import { publishPhoto, resetMessage } from '../../slices/photoSlice'
+import { 
+    getUserPhotos,
+    publishPhoto, 
+    resetMessage,
+    deletePhoto } from '../../slices/photoSlice'
 
 const Profile = () => {
     const { id } = useParams()
@@ -41,6 +45,7 @@ const Profile = () => {
     // Load user data
     useEffect(() => {
         dispatch(getUserDetails(id))
+        dispatch(getUserPhotos(id))
     }, [dispatch, id])
 
     // Functions
@@ -50,6 +55,7 @@ const Profile = () => {
         }, 2000)
     }
 
+    //publish a new photo
     const submitHandle = (e) => {
         e.preventDefault()
 
@@ -70,6 +76,17 @@ const Profile = () => {
         setTitle("")
 
         resetComponentMessage()
+    }
+
+    // Delete a photo
+    const handleDelete = (id) => {
+        dispatch(deletePhoto(id))
+
+        resetComponentMessage()
+    }
+
+    if(loading) {
+        return <p>Carregando...</p>
     }
 
 
@@ -124,6 +141,36 @@ const Profile = () => {
                 {messagePhoto && <Message msg={messagePhoto} type="success" />}
             </>
         )}
+        <div className="user-photos">
+        <h2>Fotos publicadas:</h2>
+        <div className="photos-container">
+          {photos &&
+            photos.map((photo) => (
+              <div className="photo" key={photo._id}>
+                {photo.image && (
+                  <img
+                    src={`${uploads}/photos/${photo.image}`}
+                    alt={photo.title}
+                  />
+                )}
+                {id === userAuth._id ? (
+                  <div className="actions">
+                    <Link to={`/photos/${photo._id}`}>
+                      <BsFillEyeFill />
+                    </Link>
+                    <BsPencilFill />
+                    <BsXLg onClick={() => handleDelete(photo._id)} />
+                  </div>
+                ) : (
+                  <Link className="btn" to={`/photos/${photo._id}`}>
+                    Ver
+                  </Link>
+                )}
+              </div>
+            ))}
+          {photos.length === 0 && <p>Ainda não há fotos publicadas...</p>}
+        </div>
+      </div>
     </div>
   )
 }

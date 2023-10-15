@@ -23,22 +23,52 @@ export const publishPhoto = createAsyncThunk(
         if(data.errors) {
             return thunkAPI.rejectWithValue(data.errors[0])
         }
+        return data
+    }
+)
+
+// get user photos
+export const getUserPhotos = createAsyncThunk(
+    "photo/userphotos",
+    async(id, thunkAPI) => {
+        const token = thunkAPI.getState().auth.user.token
+
+        const data = await photoService.getUserPhotos(id, token)
+
+        console.log(data)
+        console.log(data.errors)
 
         return data
     }
 )
 
-// get user's photo
+//Delete a photo
+export const deletePhoto = createAsyncThunk(
+    "photo/delete",
+    async (id, thunkAPI) => {
+
+        const token = thunkAPI.getState().auth.user.token
+
+        const data = await photoService.deletePhoto(id, token)
+
+        if(data.errors) {
+            return thunkAPI.rejectWithValue(data.errors[0])
+        }
+
+        return data
+    }
+
+)
 
 export const photoSlice = createSlice({
     name: "photos",
     initialState,
     reducers: {
         resetMessage: (state) => {
-            state.mmessage = null
+            state.message = null
         },
     },
-    extraReducers : (builder) => {
+    extraReducers: (builder) => {
         builder
             .addCase(publishPhoto.pending, (state) => {
                 state.loading = true
@@ -56,6 +86,34 @@ export const photoSlice = createSlice({
                 state.loading = false
                 state.error = action.payload
                 state.photo = null
+            })
+            .addCase(getUserPhotos.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+              })
+            .addCase(getUserPhotos.fulfilled, (state, action) => {
+                state.loading = false;
+                state.success = true;
+                state.error = null;
+                state.photos = action.payload;
+              })
+            .addCase(deletePhoto.pending, (state) => {
+                state.loading = true
+                state.error = null
+            })
+            .addCase(deletePhoto.fulfilled, (state, action) => {
+                state.loading = false
+                state.success = true
+                state.error = null
+                state.photos = state.photos.filter((photo) => {
+                    return photo._id !== action.payload.id
+                })
+                state.message = action.payload.message
+            })
+            .addCase(deletePhoto.rejected, (state, action) => {
+                state.loading = false
+                state.error = action.payload
+                state.photo = {}
             })            
     }
 })
