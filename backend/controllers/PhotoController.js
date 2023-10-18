@@ -64,12 +64,14 @@ const deletePhoto = async(req, res) => {
 }
 
 // Get all photos
-const getAllPhotos = async(req, res) => {
+ const getAllPhotos = async(req, res) => {
 
-    const photos = await Photo.find({}).sort([["createdAt", -1]]).exec()
+     const photos = await Photo.find({}).sort([["createdAt", -1]]).exec()
 
-    return res.status(200).json(photos);
-}
+     return res.status(200).json(photos);
+ }
+
+
 
 // get user photos
 const getUserPhotos = async(req, res) => {

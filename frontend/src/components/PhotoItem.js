@@ -7,7 +7,7 @@ import { Link } from 'react-router-dom'
 const PhotoItem = ({photo}) => {
   return (
     <div className="photo-item">
-        {photo.image && (
+        {photo.image &&  (
             <img
                 src={`${uploads}/photos/${photo.image}`}
                 alt={photo.title}
